@@ -24,9 +24,13 @@ export const add = mutation({
             throw new Error("Make an Organization bro, you not slick");
         }
 
+         throw new Error("Tracking test");
+
         const userId = await ctx.db.insert("users", {
             name: "Shadow M"
         });
+
+       
 
         return userId;
     }
