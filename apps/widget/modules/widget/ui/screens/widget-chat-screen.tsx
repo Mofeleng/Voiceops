@@ -81,7 +81,7 @@ export const WidgetChatScreen = () => {
 
     const onBack = () => {
         setConversationId(null);
-        setScreen("selection");
+        setScreen("inbox");
     }
     return (
         <>
@@ -164,7 +164,7 @@ export const WidgetChatScreen = () => {
                     <AIInputToolbar>
                         <AIInputTools />
                         <AIInputSubmit
-                            disabled={conversation?.status === "resolved" || form.formState.isValid }
+                            disabled={conversation?.status === "resolved" || !form.formState.isValid }
                             status="ready"
                             type="submit"
                         />
