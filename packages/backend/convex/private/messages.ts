@@ -1,9 +1,45 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "../_generated/server";
-import { components, internal } from "../_generated/api";
+import { action, mutation, query } from "../_generated/server";
+import { generateText } from "ai";
+import { components } from "../_generated/api";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
 import { saveMessage } from "@convex-dev/agent";
+import { google } from "@ai-sdk/google";
+
+export const enhanceResponse = action({
+    args: {
+        prompt: v.string()
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        
+        if (identity === null) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Identity not found"
+            });
+        }
+        
+        const organizationId = identity.orgId as string;
+
+        if (!organizationId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
+            });
+        }
+
+        const baseContext="Enhance the following content to be more professional, clear, and helpful, while maintaining the intent and key information (Only return the enhanced text, do not include any preamble or your thought process, only 1 final text): "
+
+        const response = await generateText({
+            model: google("gemini-2.0-flash"),
+            prompt: `${baseContext}\n\n${args.prompt}`
+        });
+
+        return response.text;
+    }
+})
 
 export const create = mutation({
     args: {
